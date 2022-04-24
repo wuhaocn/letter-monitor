@@ -14,7 +14,8 @@ import com.usthe.common.entity.manager.Monitor;
 import com.usthe.common.entity.message.CollectRep;
 import com.usthe.common.util.CommonConstants;
 import com.usthe.common.util.CommonUtil;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.Arrays;
@@ -29,7 +30,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * @date 2021/12/9 14:19
  */
 @Configuration
-@Slf4j
 public class CalculateAlarm {
 
     private AlerterWorkerPool workerPool;
@@ -38,6 +38,9 @@ public class CalculateAlarm {
     private AlertDefineService alertDefineService;
     private Map<String, Alert> triggeredAlertMap;
     private Map<Long, CollectRep.Code> triggeredMonitorStateAlertMap;
+
+    private static final Logger log = LoggerFactory.getLogger(CalculateAlarm.class);
+
 
     public CalculateAlarm (AlerterWorkerPool workerPool, AlerterDataQueue dataQueue,
                            AlertDefineService alertDefineService, MetricsDataExporter dataExporter,

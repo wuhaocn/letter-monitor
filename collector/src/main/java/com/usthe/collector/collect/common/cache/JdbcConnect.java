@@ -1,6 +1,7 @@
 package com.usthe.collector.collect.common.cache;
 
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 
@@ -8,8 +9,9 @@ import java.sql.Connection;
  * @author tomsun28
  * @date 2022/1/1 21:24
  */
-@Slf4j
 public class JdbcConnect implements CacheCloseable {
+
+    private static final Logger log = LoggerFactory.getLogger(String.class);
 
     private Connection connection;
 

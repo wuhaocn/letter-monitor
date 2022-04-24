@@ -6,7 +6,8 @@ import com.usthe.alert.dto.AlertSummary;
 import com.usthe.common.entity.alerter.Alert;
 import com.usthe.alert.service.AlertService;
 import com.usthe.common.util.CommonConstants;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,11 +28,12 @@ import java.util.List;
  */
 @Service
 @Transactional(rollbackFor = Exception.class)
-@Slf4j
 public class AlertServiceImpl implements AlertService {
 
     @Autowired
     private AlertDao alertDao;
+
+    private static final Logger log = LoggerFactory.getLogger(AlertServiceImpl.class);
 
     @Override
     public void addAlert(Alert alert) throws RuntimeException {

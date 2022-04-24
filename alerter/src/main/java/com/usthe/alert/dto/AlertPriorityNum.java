@@ -1,16 +1,11 @@
 package com.usthe.alert.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-
 /**
  * Number of monitoring level alarms 监控级别告警数量
  *
  * @author tom
  * @date 2022/3/6 19:52
  */
-@Data
-@AllArgsConstructor
 public class AlertPriorityNum {
 
     /**
@@ -22,4 +17,25 @@ public class AlertPriorityNum {
      * count 数量
      */
     private long num;
+
+    public AlertPriorityNum(byte priority, long num) {
+        this.priority = priority;
+        this.num = num;
+    }
+
+    public byte getPriority() {
+        return priority;
+    }
+
+    public void setPriority(byte priority) {
+        this.priority = priority;
+    }
+
+    public long getNum() {
+        return num;
+    }
+
+    public void setNum(long num) {
+        this.num = num;
+    }
 }

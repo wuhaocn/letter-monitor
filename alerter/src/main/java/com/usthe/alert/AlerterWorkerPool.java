@@ -1,7 +1,8 @@
 package com.usthe.alert;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.RejectedExecutionException;
@@ -16,10 +17,11 @@ import java.util.concurrent.TimeUnit;
  * @date 2021/11/24 18:09
  */
 @Component
-@Slf4j
 public class AlerterWorkerPool {
 
     private ThreadPoolExecutor workerExecutor;
+
+    private static final Logger log = LoggerFactory.getLogger(AlerterWorkerPool.class);
 
     public AlerterWorkerPool() {
         initWorkExecutor();

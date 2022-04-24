@@ -1,11 +1,13 @@
 package com.usthe.alert.service.impl;
 
+import com.usthe.alert.calculate.CalculateAlarm;
 import com.usthe.alert.dao.AlertDefineBindDao;
 import com.usthe.alert.dao.AlertDefineDao;
 import com.usthe.common.entity.alerter.AlertDefine;
 import com.usthe.common.entity.alerter.AlertDefineMonitorBind;
 import com.usthe.alert.service.AlertDefineService;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,7 +29,6 @@ import java.util.stream.Collectors;
  */
 @Service
 @Transactional(rollbackFor = Exception.class)
-@Slf4j
 public class AlertDefineServiceImpl implements AlertDefineService {
 
     @Autowired
@@ -35,6 +36,8 @@ public class AlertDefineServiceImpl implements AlertDefineService {
 
     @Autowired
     private AlertDefineBindDao alertDefineBindDao;
+
+    private static final Logger log = LoggerFactory.getLogger(AlertDefineServiceImpl.class);
 
     @Override
     public void validate(AlertDefine alertDefine, boolean isModify) throws IllegalArgumentException {

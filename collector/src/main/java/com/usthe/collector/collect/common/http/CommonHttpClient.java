@@ -1,6 +1,5 @@
 package com.usthe.collector.collect.common.http;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
@@ -12,6 +11,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.ssl.SSLContexts;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -27,8 +28,10 @@ import java.util.concurrent.TimeUnit;
  * @author tomsun28
  * @date 2021/12/30 21:23
  */
-@Slf4j
 public class CommonHttpClient {
+
+    private static final Logger log = LoggerFactory.getLogger(String.class);
+
 
     private static CloseableHttpClient httpClient;
 

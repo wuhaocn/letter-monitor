@@ -2,7 +2,8 @@ package com.usthe.collector.collect.common.cache;
 
 
 import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.Optional;
@@ -17,8 +18,10 @@ import java.util.concurrent.TimeUnit;
  * @author tomsun28
  * @date 2021-12-10 23:17
  */
-@Slf4j
 public class CommonCache {
+
+    private static final Logger log = LoggerFactory.getLogger(String.class);
+
 
     /**
      * 默认缓存时间 800s

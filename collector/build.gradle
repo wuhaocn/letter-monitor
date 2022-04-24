@@ -1,0 +1,24 @@
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-configuration-processor:2.4.13'
+    implementation 'org.springframework.boot:spring-boot-autoconfigure:2.4.13'
+    implementation project(':common')
+    implementation 'io.etcd:jetcd-core:0.5.11'
+    implementation 'org.apache.kafka:kafka-clients:3.0.0'
+    implementation 'org.apache.httpcomponents:httpclient:4.5.13'
+    implementation 'commons-net:commons-net:3.8.0'
+    implementation 'com.jayway.jsonpath:json-path:2.6.0'
+    implementation 'com.googlecode.concurrentlinkedhashmap:concurrentlinkedhashmap-lru:1.4.2'
+    implementation 'com.google.guava:guava:31.0.1-jre'
+    implementation 'com.google.code.gson:gson:2.8.8'
+    implementation 'com.googlecode.aviator:aviator:5.2.7'
+    implementation 'mysql:mysql-connector-java:8.0.27'
+    implementation 'org.postgresql:postgresql:42.3.3'
+    implementation 'org.apache.sshd:sshd-core:2.8.0'
+    implementation 'com.microsoft.sqlserver:mssql-jdbc:10.2.0.jre8'
+    implementation 'com.oracle.database.jdbc:ojdbc8:21.5.0.0'
+    implementation 'com.oracle.database.nls:orai18n:21.5.0.0'
+    compileOnly 'org.springframework.boot:spring-boot-starter-web:2.4.13'
+}
+
+description = 'collector'

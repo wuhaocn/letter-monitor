@@ -1,6 +1,9 @@
 package com.usthe.alert.util;
 
-import lombok.extern.slf4j.Slf4j;
+
+import com.usthe.alert.service.impl.AlertServiceImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -11,7 +14,7 @@ import java.util.regex.Pattern;
  * @author tom
  * @date 2021/12/10 11:53
  */
-@Slf4j
+
 public class AlertTemplateUtil {
 
     /**
@@ -19,6 +22,9 @@ public class AlertTemplateUtil {
      * eg: Alert, the instance: ${instance} metrics: ${metrics} is over flow.
      */
     private static final Pattern PATTERN = Pattern.compile("\\$\\{(\\w+)\\}");
+
+    private static final Logger log = LoggerFactory.getLogger(AlertTemplateUtil.class);
+
 
     public static String render(String template, Map<String, Object> replaceData) {
         try {

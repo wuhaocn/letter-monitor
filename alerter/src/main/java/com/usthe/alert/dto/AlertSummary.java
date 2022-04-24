@@ -2,9 +2,6 @@ package com.usthe.alert.dto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import static io.swagger.annotations.ApiModelProperty.AccessMode.READ_ONLY;
 
@@ -14,9 +11,6 @@ import static io.swagger.annotations.ApiModelProperty.AccessMode.READ_ONLY;
  * @author tom
  * @date 2022/3/6 19:25
  */
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
 @ApiModel(description = "en:Alarm Statistics Information,zh: 告警统计信息")
 public class AlertSummary {
 
@@ -48,4 +42,8 @@ public class AlertSummary {
     @ApiModelProperty(value = "Number of alarms whose alarm severity is urgent alarms (referring to unhandled alarms)",
             notes = "告警级别为紧急告警的告警数量(指未处理告警)", example = "23", accessMode = READ_ONLY, position = 5)
     private long priorityEmergencyNum;
+
+
+
+
 }
