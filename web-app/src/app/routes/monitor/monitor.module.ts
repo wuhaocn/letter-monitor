@@ -1,6 +1,7 @@
 import { NgModule, Type } from '@angular/core';
 import { SharedModule } from '@shared';
 import { NzBreadCrumbModule } from 'ng-zorro-antd/breadcrumb';
+import { NzCollapseModule } from 'ng-zorro-antd/collapse';
 import { NzDividerModule } from 'ng-zorro-antd/divider';
 import { NzLayoutModule } from 'ng-zorro-antd/layout';
 import { NzRadioModule } from 'ng-zorro-antd/radio';
@@ -37,7 +38,8 @@ const COMPONENTS: Array<Type<void>> = [
     NzRadioModule,
     NgxEchartsModule,
     NzLayoutModule,
-    NzSpaceModule
+    NzSpaceModule,
+    NzCollapseModule
   ],
   declarations: COMPONENTS
 })

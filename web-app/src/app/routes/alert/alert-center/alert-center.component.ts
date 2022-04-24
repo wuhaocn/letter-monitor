@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
+import { I18NService } from '@core';
+import { ALAIN_I18N_TOKEN } from '@delon/theme';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
@@ -12,7 +14,12 @@ import { AlertService } from '../../../service/alert.service';
   styles: []
 })
 export class AlertCenterComponent implements OnInit {
-  constructor(private notifySvc: NzNotificationService, private modal: NzModalService, private alertSvc: AlertService) {}
+  constructor(
+    private notifySvc: NzNotificationService,
+    private modal: NzModalService,
+    private alertSvc: AlertService,
+    @Inject(ALAIN_I18N_TOKEN) private i18nSvc: I18NService
+  ) {}
 
   pageIndex: number = 1;
   pageSize: number = 8;
@@ -29,13 +36,16 @@ export class AlertCenterComponent implements OnInit {
     this.loadAlertsTable();
   }
 
-  onFilterSearchAlerts() {
+  sync() {
+    this.loadAlertsTable();
+  }
+
+  loadAlertsTable() {
     this.tableLoading = true;
-    let filterAlerts$ = this.alertSvc
-      .searchAlerts(this.filterStatus, this.filterPriority, this.filterContent, this.pageIndex - 1, this.pageSize)
+    let alertsInit$ = this.alertSvc
+      .loadAlerts(this.filterStatus, this.filterPriority, this.filterContent, this.pageIndex - 1, this.pageSize)
       .subscribe(
         message => {
-          filterAlerts$.unsubscribe();
           this.tableLoading = false;
           this.checkedAll = false;
           this.checkedAlertIds.clear();
@@ -47,53 +57,25 @@ export class AlertCenterComponent implements OnInit {
           } else {
             console.warn(message.msg);
           }
+          alertsInit$.unsubscribe();
         },
         error => {
           this.tableLoading = false;
-          filterAlerts$.unsubscribe();
+          alertsInit$.unsubscribe();
           console.error(error.msg);
         }
       );
   }
 
-  sync() {
-    this.loadAlertsTable();
-  }
-
-  loadAlertsTable() {
-    this.tableLoading = true;
-    let alertsInit$ = this.alertSvc.getAlerts(this.pageIndex - 1, this.pageSize).subscribe(
-      message => {
-        this.tableLoading = false;
-        this.checkedAll = false;
-        this.checkedAlertIds.clear();
-        if (message.code === 0) {
-          let page = message.data;
-          this.alerts = page.content;
-          this.pageIndex = page.number + 1;
-          this.total = page.totalElements;
-        } else {
-          console.warn(message.msg);
-        }
-        alertsInit$.unsubscribe();
-      },
-      error => {
-        this.tableLoading = false;
-        alertsInit$.unsubscribe();
-        console.error(error.msg);
-      }
-    );
-  }
-
   onDeleteAlerts() {
     if (this.checkedAlertIds == null || this.checkedAlertIds.size === 0) {
-      this.notifySvc.warning('未选中任何待删除项！', '');
+      this.notifySvc.warning(this.i18nSvc.fanyi('alert.center.notify.no-delete'), '');
       return;
     }
     this.modal.confirm({
-      nzTitle: '请确认是否批量删除！',
-      nzOkText: '确定',
-      nzCancelText: '取消',
+      nzTitle: this.i18nSvc.fanyi('alert.center.confirm.delete-batch'),
+      nzOkText: this.i18nSvc.fanyi('common.button.ok'),
+      nzCancelText: this.i18nSvc.fanyi('common.button.cancel'),
       nzOkDanger: true,
       nzOkType: 'primary',
       nzOnOk: () => this.deleteAlerts(this.checkedAlertIds)
@@ -102,13 +84,13 @@ export class AlertCenterComponent implements OnInit {
 
   onMarkReadAlerts() {
     if (this.checkedAlertIds == null || this.checkedAlertIds.size === 0) {
-      this.notifySvc.warning('未选中任何待标记项！', '');
+      this.notifySvc.warning(this.i18nSvc.fanyi('alert.center.notify.no-mark'), '');
       return;
     }
     this.modal.confirm({
-      nzTitle: '请确认是否批量标记已处理！',
-      nzOkText: '确定',
-      nzCancelText: '取消',
+      nzTitle: this.i18nSvc.fanyi('alert.center.confirm.mark-done-batch'),
+      nzOkText: this.i18nSvc.fanyi('common.button.ok'),
+      nzCancelText: this.i18nSvc.fanyi('common.button.cancel'),
       nzOkDanger: true,
       nzOkType: 'primary',
       nzOnOk: () => this.updateAlertsStatus(this.checkedAlertIds, 3)
@@ -116,13 +98,13 @@ export class AlertCenterComponent implements OnInit {
   }
   onMarkUnReadAlerts() {
     if (this.checkedAlertIds == null || this.checkedAlertIds.size === 0) {
-      this.notifySvc.warning('未选中任何待标记项！', '');
+      this.notifySvc.warning(this.i18nSvc.fanyi('alert.center.notify.no-mark'), '');
       return;
     }
     this.modal.confirm({
-      nzTitle: '请确认是否批量标记未处理！',
-      nzOkText: '确定',
-      nzCancelText: '取消',
+      nzTitle: this.i18nSvc.fanyi('alert.center.confirm.mark-no-batch'),
+      nzOkText: this.i18nSvc.fanyi('common.button.ok'),
+      nzCancelText: this.i18nSvc.fanyi('common.button.cancel'),
       nzOkDanger: true,
       nzOkType: 'primary',
       nzOnOk: () => this.updateAlertsStatus(this.checkedAlertIds, 0)
@@ -133,9 +115,9 @@ export class AlertCenterComponent implements OnInit {
     let alerts = new Set<number>();
     alerts.add(alertId);
     this.modal.confirm({
-      nzTitle: '请确认是否删除！',
-      nzOkText: '确定',
-      nzCancelText: '取消',
+      nzTitle: this.i18nSvc.fanyi('common.confirm.delete'),
+      nzOkText: this.i18nSvc.fanyi('common.button.ok'),
+      nzCancelText: this.i18nSvc.fanyi('common.button.cancel'),
       nzOkDanger: true,
       nzOkType: 'primary',
       nzOnOk: () => this.deleteAlerts(alerts)
@@ -146,9 +128,9 @@ export class AlertCenterComponent implements OnInit {
     let alerts = new Set<number>();
     alerts.add(alertId);
     this.modal.confirm({
-      nzTitle: '请确认是否标记已处理！',
-      nzOkText: '确定',
-      nzCancelText: '取消',
+      nzTitle: this.i18nSvc.fanyi('alert.center.confirm.mark-done'),
+      nzOkText: this.i18nSvc.fanyi('common.button.ok'),
+      nzCancelText: this.i18nSvc.fanyi('common.button.cancel'),
       nzOkDanger: true,
       nzOkType: 'primary',
       nzOnOk: () => this.updateAlertsStatus(alerts, 3)
@@ -159,9 +141,9 @@ export class AlertCenterComponent implements OnInit {
     let alerts = new Set<number>();
     alerts.add(alertId);
     this.modal.confirm({
-      nzTitle: '请确认是否标记未处理！',
-      nzOkText: '确定',
-      nzCancelText: '取消',
+      nzTitle: this.i18nSvc.fanyi('alert.center.confirm.mark-no'),
+      nzOkText: this.i18nSvc.fanyi('common.button.ok'),
+      nzCancelText: this.i18nSvc.fanyi('common.button.cancel'),
       nzOkDanger: true,
       nzOkType: 'primary',
       nzOnOk: () => this.updateAlertsStatus(alerts, 0)
@@ -174,17 +156,17 @@ export class AlertCenterComponent implements OnInit {
       message => {
         deleteAlerts$.unsubscribe();
         if (message.code === 0) {
-          this.notifySvc.success('删除成功！', '');
+          this.notifySvc.success(this.i18nSvc.fanyi('common.notify.delete-success'), '');
           this.loadAlertsTable();
         } else {
           this.tableLoading = false;
-          this.notifySvc.error('删除失败！', message.msg);
+          this.notifySvc.error(this.i18nSvc.fanyi('common.notify.delete-fail'), message.msg);
         }
       },
       error => {
         this.tableLoading = false;
         deleteAlerts$.unsubscribe();
-        this.notifySvc.error('删除失败！', error.msg);
+        this.notifySvc.error(this.i18nSvc.fanyi('common.notify.delete-fail'), error.msg);
       }
     );
   }
@@ -195,17 +177,17 @@ export class AlertCenterComponent implements OnInit {
       message => {
         markAlertsStatus$.unsubscribe();
         if (message.code === 0) {
-          this.notifySvc.success('标记成功！', '');
+          this.notifySvc.success(this.i18nSvc.fanyi('common.notify.mark-success'), '');
           this.loadAlertsTable();
         } else {
           this.tableLoading = false;
-          this.notifySvc.error('标记失败！', message.msg);
+          this.notifySvc.error(this.i18nSvc.fanyi('common.notify.mark-fail'), message.msg);
         }
       },
       error => {
         this.tableLoading = false;
         markAlertsStatus$.unsubscribe();
-        this.notifySvc.error('标记失败！', error.msg);
+        this.notifySvc.error(this.i18nSvc.fanyi('common.notify.mark-fail'), error.msg);
       }
     );
   }

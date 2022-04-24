@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import { TitleService } from '@delon/theme';
+import { I18NService } from '@core';
+import { ALAIN_I18N_TOKEN, TitleService } from '@delon/theme';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { throwError } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
@@ -25,11 +26,14 @@ export class MonitorEditComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private titleSvc: TitleService,
-    private notifySvc: NzNotificationService
+    private notifySvc: NzNotificationService,
+    @Inject(ALAIN_I18N_TOKEN) private i18nSvc: I18NService
   ) {}
 
   paramDefines!: ParamDefine[];
   params!: Param[];
+  advancedParamDefines!: ParamDefine[];
+  advancedParams!: Param[];
   paramValueMap = new Map<String, Param>();
   monitor = new Monitor();
   profileForm: FormGroup = new FormGroup({});
@@ -59,26 +63,33 @@ export class MonitorEditComponent implements OnInit {
                 this.paramValueMap.set(item.field, item);
               });
             }
-            this.params = message.data.params;
             this.detected = message.data.detected ? message.data.detected : true;
           } else {
             console.warn(message.msg);
-            this.notifySvc.error('查询异常，此监控不存在', message.msg);
-            return throwError('查询此监控异常');
+            this.notifySvc.error(this.i18nSvc.fanyi('monitors.not-found'), message.msg);
+            return throwError(this.i18nSvc.fanyi('monitors.not-found'));
           }
           return this.appDefineSvc.getAppParamsDefine(this.monitor.app);
         })
       )
       .subscribe(message => {
         if (message.code === 0) {
-          this.paramDefines = message.data;
           this.params = [];
-          this.paramDefines.forEach(define => {
+          this.advancedParams = [];
+          this.paramDefines = [];
+          this.advancedParamDefines = [];
+          message.data.forEach(define => {
             let param = this.paramValueMap.get(define.field);
             if (param === undefined) {
               param = new Param();
               param.field = define.field;
-              param.type = define.type === 'number' ? 0 : 1;
+              if (define.type === 'number') {
+                param.type = 0;
+              } else if (define.type === 'key-value') {
+                param.type = 3;
+              } else {
+                param.type = 1;
+              }
               if (define.type === 'boolean') {
                 param.value = false;
               }
@@ -94,12 +105,33 @@ export class MonitorEditComponent implements OnInit {
                 }
               }
             }
-            this.params.push(param);
+            if (define.hide) {
+              this.advancedParams.push(param);
+              this.advancedParamDefines.push(define);
+            } else {
+              this.params.push(param);
+              this.paramDefines.push(define);
+            }
           });
         } else {
           console.warn(message.msg);
         }
       });
+  }
+
+  onParamBooleanChanged(booleanValue: boolean, field: string) {
+    // 对SSL的端口联动处理, 不开启SSL默认80端口，开启SSL默认443
+    if (field === 'ssl') {
+      this.params.forEach(param => {
+        if (param.field === 'port') {
+          if (booleanValue) {
+            param.value = '443';
+          } else {
+            param.value = '80';
+          }
+        }
+      });
+    }
   }
 
   onSubmit(formGroup: FormGroup) {
@@ -123,25 +155,30 @@ export class MonitorEditComponent implements OnInit {
         param.value = (param.value as string).trim();
       }
     });
+    this.advancedParams.forEach(param => {
+      if (param.value != null && typeof param.value == 'string') {
+        param.value = (param.value as string).trim();
+      }
+    });
     let addMonitor = {
       detected: this.detected,
       monitor: this.monitor,
-      params: this.params
+      params: this.params.concat(this.advancedParams)
     };
     this.isSpinning = true;
     this.monitorSvc.editMonitor(addMonitor).subscribe(
       message => {
         this.isSpinning = false;
         if (message.code === 0) {
-          this.notifySvc.success('修改监控成功', '');
+          this.notifySvc.success(this.i18nSvc.fanyi('monitors.edit.success'), '');
           this.router.navigateByUrl(`/monitors?app=${this.monitor.app}`);
         } else {
-          this.notifySvc.error('修改监控失败', message.msg);
+          this.notifySvc.error(this.i18nSvc.fanyi('monitors.edit.failed'), message.msg);
         }
       },
       error => {
         this.isSpinning = false;
-        this.notifySvc.error('修改监控失败', error.error.msg);
+        this.notifySvc.error(this.i18nSvc.fanyi('monitors.edit.failed'), error.error.msg);
       }
     );
   }
@@ -167,24 +204,29 @@ export class MonitorEditComponent implements OnInit {
         param.value = (param.value as string).trim();
       }
     });
+    this.advancedParams.forEach(param => {
+      if (param.value != null && typeof param.value == 'string') {
+        param.value = (param.value as string).trim();
+      }
+    });
     let detectMonitor = {
       detected: this.detected,
       monitor: this.monitor,
-      params: this.params
+      params: this.params.concat(this.advancedParams)
     };
     this.isSpinning = true;
     this.monitorSvc.detectMonitor(detectMonitor).subscribe(
       message => {
         this.isSpinning = false;
         if (message.code === 0) {
-          this.notifySvc.success('探测成功', '');
+          this.notifySvc.success(this.i18nSvc.fanyi('monitors.detect.success'), '');
         } else {
-          this.notifySvc.error('探测失败', message.msg);
+          this.notifySvc.error(this.i18nSvc.fanyi('monitors.detect.failed'), message.msg);
         }
       },
       error => {
         this.isSpinning = false;
-        this.notifySvc.error('探测异常', error.error.msg);
+        this.notifySvc.error(this.i18nSvc.fanyi('monitors.detect.failed'), error.error.msg);
       }
     );
   }

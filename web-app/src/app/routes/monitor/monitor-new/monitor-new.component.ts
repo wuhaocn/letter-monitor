@@ -1,8 +1,8 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { I18NService } from '@core';
-import { TitleService } from '@delon/theme';
+import { ALAIN_I18N_TOKEN, TitleService } from '@delon/theme';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { switchMap } from 'rxjs/operators';
 
@@ -20,6 +20,8 @@ import { MonitorService } from '../../../service/monitor.service';
 export class MonitorNewComponent implements OnInit {
   paramDefines!: ParamDefine[];
   params!: Param[];
+  advancedParamDefines!: ParamDefine[];
+  advancedParams!: Param[];
   monitor!: Monitor;
   detected: boolean = true;
   passwordVisible: boolean = false;
@@ -32,7 +34,7 @@ export class MonitorNewComponent implements OnInit {
     private router: Router,
     private notifySvc: NzNotificationService,
     private cdr: ChangeDetectorRef,
-    private i18n: I18NService,
+    @Inject(ALAIN_I18N_TOKEN) private i18nSvc: I18NService,
     private titleSvc: TitleService,
     private formBuilder: FormBuilder
   ) {
@@ -53,12 +55,20 @@ export class MonitorNewComponent implements OnInit {
       )
       .subscribe(message => {
         if (message.code === 0) {
-          this.paramDefines = message.data;
           this.params = [];
-          this.paramDefines.forEach(define => {
+          this.advancedParams = [];
+          this.paramDefines = [];
+          this.advancedParamDefines = [];
+          message.data.forEach(define => {
             let param = new Param();
             param.field = define.field;
-            param.type = define.type === 'number' ? 0 : 1;
+            if (define.type === 'number') {
+              param.type = 0;
+            } else if (define.type === 'key-value') {
+              param.type = 3;
+            } else {
+              param.type = 1;
+            }
             if (define.type === 'boolean') {
               param.value = false;
             }
@@ -71,7 +81,13 @@ export class MonitorNewComponent implements OnInit {
                 param.value = define.defaultValue;
               }
             }
-            this.params.push(param);
+            if (define.hide) {
+              this.advancedParams.push(param);
+              this.advancedParamDefines.push(define);
+            } else {
+              this.params.push(param);
+              this.paramDefines.push(define);
+            }
           });
         } else {
           console.warn(message.msg);
@@ -81,6 +97,21 @@ export class MonitorNewComponent implements OnInit {
 
   onHostChange(hostValue: string) {
     this.monitor.name = `${this.monitor.app.toUpperCase()}_${hostValue}`;
+  }
+
+  onParamBooleanChanged(booleanValue: boolean, field: string) {
+    // 对SSL的端口联动处理, 不开启SSL默认80端口，开启SSL默认443
+    if (field === 'ssl') {
+      this.params.forEach(param => {
+        if (param.field === 'port') {
+          if (booleanValue) {
+            param.value = '443';
+          } else {
+            param.value = '80';
+          }
+        }
+      });
+    }
   }
 
   onSubmit(formGroup: FormGroup) {
@@ -104,25 +135,30 @@ export class MonitorNewComponent implements OnInit {
         param.value = (param.value as string).trim();
       }
     });
+    this.advancedParams.forEach(param => {
+      if (param.value != null && typeof param.value == 'string') {
+        param.value = (param.value as string).trim();
+      }
+    });
     let addMonitor = {
       detected: this.detected,
       monitor: this.monitor,
-      params: this.params
+      params: this.params.concat(this.advancedParams)
     };
     this.isSpinning = true;
     this.monitorSvc.newMonitor(addMonitor).subscribe(
       message => {
         this.isSpinning = false;
         if (message.code === 0) {
-          this.notifySvc.success('新增监控成功', '');
+          this.notifySvc.success(this.i18nSvc.fanyi('monitors.new.success'), '');
           this.router.navigateByUrl(`/monitors?app=${this.monitor.app}`);
         } else {
-          this.notifySvc.error('新增监控失败', message.msg);
+          this.notifySvc.error(this.i18nSvc.fanyi('monitors.new.failed'), message.msg);
         }
       },
       error => {
         this.isSpinning = false;
-        this.notifySvc.error('新增监控失败', error.error.msg);
+        this.notifySvc.error(this.i18nSvc.fanyi('monitors.new.failed'), error.error.msg);
       }
     );
   }
@@ -148,24 +184,29 @@ export class MonitorNewComponent implements OnInit {
         param.value = (param.value as string).trim();
       }
     });
+    this.advancedParams.forEach(param => {
+      if (param.value != null && typeof param.value == 'string') {
+        param.value = (param.value as string).trim();
+      }
+    });
     let detectMonitor = {
       detected: true,
       monitor: this.monitor,
-      params: this.params
+      params: this.params.concat(this.advancedParams)
     };
     this.isSpinning = true;
     this.monitorSvc.detectMonitor(detectMonitor).subscribe(
       message => {
         this.isSpinning = false;
         if (message.code === 0) {
-          this.notifySvc.success('探测成功', '');
+          this.notifySvc.success(this.i18nSvc.fanyi('monitors.detect.success'), '');
         } else {
-          this.notifySvc.error('探测失败', message.msg);
+          this.notifySvc.error(this.i18nSvc.fanyi('monitors.detect.failed'), message.msg);
         }
       },
       error => {
         this.isSpinning = false;
-        this.notifySvc.error('探测异常', error.error.msg);
+        this.notifySvc.error(this.i18nSvc.fanyi('monitors.detect.failed'), error.error.msg);
       }
     );
   }

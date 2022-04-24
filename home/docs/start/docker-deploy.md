@@ -6,6 +6,8 @@ sidebar_label: Docker方式部署
 
 > 推荐使用docker部署HertzBeat  
 
+安装部署视频教程: [HertzBeat安装部署-BiliBili](https://www.bilibili.com/video/BV1GY41177YL)  
+
 1. 下载安装Docker环境   
    Docker 工具自身的下载请参考 [Docker官网文档](https://docs.docker.com/get-docker/)。
    安装完毕后终端查看Docker版本是否正常输出。
@@ -45,74 +47,104 @@ sidebar_label: Docker方式部署
    在主机目录下创建sureness.yml，eg:/opt/sureness.yml  
    配置文件内容参考 项目仓库[/script/sureness.yml](https://gitee.com/dromara/hertzbeat/blob/master/script/sureness.yml)
    
-   ```yaml
-   
-   resourceRole:
-   - /account/auth/refresh===post===[role1,role2,role3,role4]
-   
-   excludedResource:
-   - /account/auth/**===*
-   - /===get
-   - /i18n/**===get
-   - /apps/hierarchy===get
-   - /console/**===get
-   - /**/*.html===get
-   - /**/*.js===get
-   - /**/*.css===get
-   - /**/*.ico===get
-   - /**/*.ttf===get
-   - /**/*.png===get
-   - /**/*.gif===get
+```yaml
+
+resourceRole:
+- /account/auth/refresh===post===[admin,user,guest]
+- /apps/**===get===[admin,user,guest]
+- /monitor/**===get===[admin,user,guest]
+- /monitor/**===post===[admin,user]
+- /monitor/**===put===[admin,user]
+- /monitor/**===delete==[admin]
+- /monitors/**===get===[admin,user,guest]
+- /monitors/**===post===[admin,user]
+- /monitors/**===put===[admin,user]
+- /monitors/**===delete===[admin]
+- /alert/**===get===[admin,user,guest]
+- /alert/**===post===[admin,user]
+- /alert/**===put===[admin,user]
+- /alert/**===delete===[admin]
+- /alerts/**===get===[admin,user,guest]
+- /alerts/**===post===[admin,user]
+- /alerts/**===put===[admin,user]
+- /alerts/**===delete===[admin]
+- /notice/**===get===[admin,user,guest]
+- /notice/**===post===[admin,user]
+- /notice/**===put===[admin,user]
+- /notice/**===delete===[admin]
+- /summary/**===get===[admin,user,guest]
+- /summary/**===post===[admin,user]
+- /summary/**===put===[admin,user]
+- /summary/**===delete===[admin]
+
+excludedResource:
+- /account/auth/**===*
+- /===get
+- /i18n/**===get
+- /apps/hierarchy===get
+# web ui 静态资源
+- /console/**===get
+- /**/*.html===get
+- /**/*.js===get
+- /**/*.css===get
+- /**/*.ico===get
+- /**/*.ttf===get
+- /**/*.png===get
+- /**/*.gif===get
    - /**/*.png===*
-   - /swagger-resources/**===get
-   - /v2/api-docs===get
-   - /v3/api-docs===get
-   
-   # 用户账户信息
-   # 下面有 admin tom lili 三个账户
-   # eg: admin 拥有[role1,role2]角色,密码为admin
-   # eg: tom 拥有[role1,role2,role3],密码为tom@123
-   # eg: lili 拥有[role1,role2],明文密码为lili, 加盐密码为1A676730B0C7F54654B0E09184448289
-   account:
-   - appId: admin
-     credential: admin
-     role: [role1,role2]
-   - appId: tom
-     credential: tom@123
-     role: [role1,role2,role3]
-   - appId: lili
-     # 注意 Digest认证不支持加盐加密的密码账户
-     # 加盐加密的密码，通过 MD5(password+salt)计算
-     # 此账户的原始密码为 lili
-     credential: 1A676730B0C7F54654B0E09184448289
-     salt: 123
-     role: [role1,role2]
-   ```
+# swagger ui 资源
+- /swagger-resources/**===get
+- /v2/api-docs===get
+- /v3/api-docs===get
+
+account:
+- appId: admin
+  credential: admin
+  role: [admin,user]
+- appId: tom
+  credential: tom@123
+  role: [user]
+- appId: guest
+  credential: guest
+  role: [guest]
+- appId: lili
+  # 注意 Digest认证不支持加盐加密的密码账户
+  # 加盐加密的密码，通过 MD5(password+salt)计算
+  # 此账户的原始密码为 lili
+  credential: 1A676730B0C7F54654B0E09184448289
+  salt: 123
+  role: [guest]
+
+```
    
    修改sureness.yml的如下**部分参数**：**[注意⚠️sureness配置的其它默认参数需保留]**  
    
-   ```yaml
+```yaml
    
-   # 用户账户信息
-   # 下面有 admin tom lili 三个账户
-   # eg: admin 拥有[role1,role2]角色,密码为admin
-   # eg: tom 拥有[role1,role2,role3],密码为tom@123
-   # eg: lili 拥有[role1,role2],明文密码为lili, 加盐密码为1A676730B0C7F54654B0E09184448289  
-   account:
-   - appId: admin
-     credential: admin
-     role: [role1,role2]
-   - appId: tom
-     credential: tom@123
-     role: [role1,role2,role3]
-   - appId: lili
-     # 注意 Digest认证不支持加盐加密的密码账户
-     # 加盐加密的密码，通过 MD5(password+salt)计算
-     # 此账户的原始密码为 lili
-     credential: 1A676730B0C7F54654B0E09184448289
-     salt: 123
-     role: [role1,role2]
-   ```
+# 用户账户信息
+# 下面有 admin tom lili 三个账户
+# eg: admin 拥有[admin,user]角色,密码为admin
+# eg: tom 拥有[user],密码为tom@123
+# eg: lili 拥有[guest],明文密码为lili, 加盐密码为1A676730B0C7F54654B0E09184448289
+account:
+- appId: admin
+  credential: admin
+  role: [admin,user]
+- appId: tom
+  credential: tom@123
+  role: [user]
+- appId: guest
+  credential: guest
+  role: [guest]
+- appId: lili
+  # 注意 Digest认证不支持加盐加密的密码账户
+  # 加盐加密的密码，通过 MD5(password+salt)计算
+  # 此账户的原始密码为 lili
+  credential: 1A676730B0C7F54654B0E09184448289
+  salt: 123
+  role: [guest]
+
+```
 
 6. 启动HertzBeat Docker容器  
    ``` 
