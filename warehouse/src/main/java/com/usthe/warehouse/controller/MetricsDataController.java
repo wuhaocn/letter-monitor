@@ -9,7 +9,7 @@ import com.usthe.common.entity.dto.ValueRow;
 import com.usthe.common.entity.message.CollectRep;
 import com.usthe.common.util.CommonConstants;
 import com.usthe.warehouse.store.MemoryDataStorage;
-import com.usthe.warehouse.store.TdEngineDataStorage;
+//import com.usthe.warehouse.store.TdEngineDataStorage;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -42,8 +42,8 @@ public class MetricsDataController {
     @Autowired
     private MemoryDataStorage memoryDataStorage;
 
-    @Autowired
-    private TdEngineDataStorage tdEngineDataStorage;
+//    @Autowired
+//    private TdEngineDataStorage tdEngineDataStorage;
 
     @GetMapping("/monitor/{monitorId}/metrics/{metrics}")
     @ApiOperation(value = "查询监控指标组的指标数据", notes = "查询监控指标组的指标数据")
@@ -56,23 +56,24 @@ public class MetricsDataController {
         if (redisData == null) {
             return ResponseEntity.ok().body(new Message<>("query metrics data is empty"));
         }
-        {
-            MetricsData.MetricsDataBuilder dataBuilder = MetricsData.builder();
-            dataBuilder.id(redisData.getId()).app(redisData.getApp()).metric(redisData.getMetrics())
-                    .time(redisData.getTime());
-            List<Field> fields = redisData.getFieldsList().stream().map(redisField ->
-                            Field.builder().name(redisField.getName())
-                                    .type(Integer.valueOf(redisField.getType()).byteValue())
-                                    .build())
-                    .collect(Collectors.toList());
-            dataBuilder.fields(fields);
-            List<ValueRow> valueRows = redisData.getValuesList().stream().map(redisValueRow ->
-                    ValueRow.builder().instance(redisValueRow.getInstance())
-                            .values(redisValueRow.getColumnsList().stream().map(Value::new).collect(Collectors.toList()))
-                    .build()).collect(Collectors.toList());
-            dataBuilder.valueRows(valueRows);
-            return ResponseEntity.ok().body(new Message<>(dataBuilder.build()));
-        }
+//        {
+//            MetricsData.MetricsDataBuilder dataBuilder = MetricsData.builder();
+//            dataBuilder.id(redisData.getId()).app(redisData.getApp()).metric(redisData.getMetrics())
+//                    .time(redisData.getTime());
+//            List<Field> fields = redisData.getFieldsList().stream().map(redisField ->
+//                            Field.builder().name(redisField.getName())
+//                                    .type(Integer.valueOf(redisField.getType()).byteValue())
+//                                    .build())
+//                    .collect(Collectors.toList());
+//            dataBuilder.fields(fields);
+//            List<ValueRow> valueRows = redisData.getValuesList().stream().map(redisValueRow ->
+//                    ValueRow.builder().instance(redisValueRow.getInstance())
+//                            .values(redisValueRow.getColumnsList().stream().map(Value::new).collect(Collectors.toList()))
+//                    .build()).collect(Collectors.toList());
+//            dataBuilder.valueRows(valueRows);
+//            return ResponseEntity.ok().body(new Message<>(dataBuilder.build()));
+//        }
+        return ResponseEntity.ok().body(new Message<>("query metrics data is empty"));
     }
 
     @GetMapping("/monitor/{monitorId}/metric/{metricFull}")
@@ -99,18 +100,19 @@ public class MetricsDataController {
         if (history == null) {
             history = "6h";
         }
-        Map<String, List<Value>> instanceValuesMap;
-        if (interval == null || !interval) {
-            instanceValuesMap = tdEngineDataStorage
-                    .getHistoryMetricData(monitorId, app, metrics, metric, instance, history);
-        } else {
-            instanceValuesMap = tdEngineDataStorage
-                    .getHistoryIntervalMetricData(monitorId, app, metrics, metric, instance, history);
-        }
-        MetricsHistoryData historyData = MetricsHistoryData.builder()
-                .id(monitorId).metric(metrics).values(instanceValuesMap)
-                .field(Field.builder().name(metric).type(CommonConstants.TYPE_NUMBER).build())
-                .build();
-        return ResponseEntity.ok().body(new Message<>(historyData));
+//        Map<String, List<Value>> instanceValuesMap;
+//        if (interval == null || !interval) {
+//            instanceValuesMap = tdEngineDataStorage
+//                    .getHistoryMetricData(monitorId, app, metrics, metric, instance, history);
+//        } else {
+//            instanceValuesMap = tdEngineDataStorage
+//                    .getHistoryIntervalMetricData(monitorId, app, metrics, metric, instance, history);
+//        }
+//        MetricsHistoryData historyData = MetricsHistoryData.builder()
+//                .id(monitorId).metric(metrics).values(instanceValuesMap)
+//                .field(Field.builder().name(metric).type(CommonConstants.TYPE_NUMBER).build())
+//                .build();
+//        return ResponseEntity.ok().body(new Message<>(historyData));
+        return ResponseEntity.ok().body(new Message<>("query metrics data is empty"));
     }
 }
