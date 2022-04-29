@@ -12,6 +12,10 @@ dependencies {
     compileOnly 'org.springframework.boot:spring-boot-starter-data-jpa:2.4.13'
     compileOnly 'org.springframework.boot:spring-boot-starter-validation:2.4.13'
     compileOnly 'com.fasterxml.jackson.core:jackson-annotations:2.11.4'
-    compileOnly 'io.springfox:springfox-boot-starter:3.0.0'
+//    compileOnly 'io.springfox:springfox-boot-starter:3.0.0'
     compileOnly 'io.etcd:jetcd-core:0.5.11'
+
+    compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
+    compile group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'
+
 }

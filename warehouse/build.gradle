@@ -12,6 +12,5 @@ dependencies {
     compileOnly 'org.springframework.boot:spring-boot-starter-web:2.4.13'
     compileOnly 'org.springframework.boot:spring-boot-starter-jdbc:2.4.13'
     compileOnly 'io.lettuce:lettuce-core:6.0.8.RELEASE'
-    compileOnly 'io.springfox:springfox-boot-starter:3.0.0'
     compileOnly 'org.springframework.cloud:spring-cloud-starter-openfeign:3.0.5'
 }
