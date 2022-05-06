@@ -36,6 +36,12 @@
           "icon": "anticon-cloud"
         },
         {
+          "key": "meter",
+          "text": "服务性能",
+          "i18n": "menu.monitor.meter",
+          "icon": "anticon-cloud"
+        },
+        {
           "key": "db",
           "text": "数据库",
           "i18n": "menu.monitor.db",

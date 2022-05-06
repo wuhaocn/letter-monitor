@@ -10,6 +10,7 @@
     "monitor": {
       "": "监控",
       "service": "应用服务监控",
+      "meter": "服务性能监控",
       "db": "数据库监控",
       "os": "操作系统监控",
       "mid": "中间件监控",
@@ -50,6 +51,7 @@
     "category": {
       "": "监控类别",
       "service": "应用服务",
+      "meter": "服务性能",
       "db": "数据库",
       "os": "操作系统",
       "mid": "中间件",
@@ -65,7 +67,9 @@
       "mysql": "Mysql",
       "oracle": "Oracle",
       "redis": "Redis",
-      "fullsite": "全站监控"
+      "fullsite": "全站监控",
+      "metercenter": "自动配置",
+      "meterlist": "手工配置"
     },
     "status": {
       "": "监控状态",
